@@ -1,6 +1,9 @@
+#![allow(dead_code)]
+#![allow(unused_imports)]
 mod treewalk {
     use std::path::Path;
     use std::path::PathBuf;
+
 
     pub fn children(path: &Path) -> Vec<PathBuf> {
         let mut children: Vec<PathBuf> = Vec::new();
@@ -112,20 +115,46 @@ mod treewalk {
         }
         i
     }
-
+        //assert_eq!(human_readable(999), "999B");
+        //assert_eq!(human_readable(1_000), "1000B");
+        //assert_eq!(human_readable(10_000), "10KB");
+        //assert_eq!(human_readable(100_000), "100KB");
+        //assert_eq!(human_readable(500_000), "500KB");
+        //assert_eq!(human_readable(1_000_000), "1000KB");
+        //assert_eq!(human_readable(10_000_000), "10MB");
+        //assert_eq!(human_readable(100_000_000), "100MB");
+        //assert_eq!(human_readable(1_000_000_000), "1000MB");
+        //assert_eq!(human_readable(1_000_000_001), "1GB");
+        //assert_eq!(human_readable(1_000_000_000_000), "100GB");
+        //u64 MAX: 18_446_744_073_709_551_615
     pub fn human_readable(num: u64) -> String {
         let result = String::from("");
         let num_str = String::from(&num.to_string());
-        match digit_len(num) {
-            1..=4 => result + &num_str + "B",
-            5..=7 =>  result + &num_str[..(num_str.len() - 3)] + "KB",
-            8..=12 =>  result + &num_str[..(num_str.len() - 6)] + "MB",
-            13..=16 => result + &num_str[..(num_str.len() - 9)] + "MB",
-            _ => 0.0.to_string(),
+        match num {
+            ..=1_000 => result + &num_str + "B",
+            1_001..=1_000_000 =>  result + &num_str[..(num_str.len() - 3)] + "KB",
+
+            1_000_001..=1_000_000_000 =>  result + &num_str[..(num_str.len() - 6)] + "MB",
+            1_000_000_001..=1_000_000_000_000 => result + &num_str[..(num_str.len() - 9)] + "GB",
+            1_000_000_000_001..=1_000_000_000_000_000 => result + &num_str[..(num_str.len() - 12)] + "TB",
+            1_000_000_000_000_001.. => result + &num_str[..(num_str.len() - 15)] + "PB",
         }
     }
 
 }
+    //pub fn thuman_readable(num: u64) -> String {
+    //    let result = String::from("");
+    //    let num_str = String::from(&num.to_string());
+    //    let symbols = ["B", "KB", "MB", "GB"];
+
+    //    for i in 0..4 {
+    //        let ti: usize = i;
+    //        if i*1000 < num && num < (i+1)*1000 {
+    //            return result + &num_str[..(num_str.len() - ti*3)] + symbols[i]
+    //        }
+    //    }
+    //    return String::from("too large")
+    //}
 
 fn main() {
     use std::env;
@@ -144,17 +173,21 @@ fn main() {
         //    println!("{:?}: {:?}", file_name, small.size);
         //}
 
-        let num: u64 = 10_000_000;
-        println!("{}", human_readable(num));
+        //let num: u64 = 10_000_000;
+        //println!("{}", human_readable(num));
 
-        assert_eq!(human_readable(1_000), "1000B");
         assert_eq!(human_readable(999), "999B");
+        assert_eq!(human_readable(1_000), "1000B");
         assert_eq!(human_readable(10_000), "10KB");
         assert_eq!(human_readable(100_000), "100KB");
         assert_eq!(human_readable(500_000), "500KB");
         assert_eq!(human_readable(1_000_000), "1000KB");
         assert_eq!(human_readable(10_000_000), "10MB");
+        assert_eq!(human_readable(100_000_000), "100MB");
         assert_eq!(human_readable(1_000_000_000), "1000MB");
+        assert_eq!(human_readable(1_000_000_001), "1GB");
+        assert_eq!(human_readable(1_000_000_000_000), "1000GB");
+        assert_eq!(human_readable(10_000_000_000_000), "10TB");
     }
     else {
         println!("No files found.");
