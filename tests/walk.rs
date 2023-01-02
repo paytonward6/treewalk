@@ -3,11 +3,11 @@
 
 use std::env;
 use std::path::{Path, PathBuf};
-use treewalk::walk::{comparisons, lineage, format};
+use treewalk::walk::{comparison, lineage, format};
 
 #[cfg(test)]
 mod tests {
-    use treewalk::walk::{comparisons, lineage, format};
+    use treewalk::walk::{comparison, lineage, format};
     #[test]
     fn test_comparison_human_readable() {
         assert_eq!(format::human_readable(999), "999B");
@@ -34,7 +34,7 @@ fn main() {
         let mut children: Vec<PathBuf> = Vec::new();
         lineage::recursively_list_contents(&path.to_path_buf(), &mut children);
 
-        let small = comparisons::largest_file(children);
+        let small = comparison::largest_file(children);
         if let Some(file_name) = &small.name {
             println!("{:?}: {:?}", file_name, small.size);
         }

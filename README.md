@@ -1,18 +1,18 @@
-use std::env;
-use std::path::{Path, PathBuf};
-use treewalk::walk::{comparison, lineage, format};
+# [treewalk v0.1.1](https://crates.io/crates/treewalk)
+Common utilities for exploring a file tree
 
-fn main() {
+## Example usage
+```rust
+    use std::path::{Path, PathBuf};
+    use treewalk::walk::{comparison, lineage, format};
 
-    let args: Vec<String> = env::args().collect();
-    if args.len() >= 2 {
-        let path = Path::new(&args[1]);
+    fn main() {
+        let path = Path::new("./foo/bar");
 
         let mut children: Vec<PathBuf> = Vec::new();
         lineage::recursively_list_contents(&path.to_path_buf(), &mut children);
 
         let small = comparison::largest_file(children);
-        println!("{:?}", small);
         if let Some(file_name) = &small.name {
             println!("{:?}: {:?}", file_name, format::human_readable(small.size));
         }
@@ -21,7 +21,5 @@ fn main() {
             println!("{}", ancestor.display());
         }
     }
-    else {
-        println!("No files found.");
-    }
-}
+
+```

@@ -1,7 +1,7 @@
 #![allow(dead_code)]
 #![allow(unused_imports)]
 
-pub mod comparisons {
+pub mod comparison {
     use std::path::Path;
     use std::path::PathBuf;
 
@@ -12,7 +12,7 @@ pub mod comparisons {
         //uniq: bool,
     }
 
-    //TODO: implement uniq for sizequery
+    //TODO: implement uniq for SizeQuery
     pub fn largest_file(children: Vec<PathBuf>) -> SizeQuery {
         let mut result = SizeQuery{name: None, size: 0};
         for child in children {
@@ -29,7 +29,7 @@ pub mod comparisons {
         result
     }
 
-    //TODO: implement uniq for sizequery
+    //TODO: implement uniq for SizeQuery
     pub fn largest_dir(children: Vec<PathBuf>) -> SizeQuery {
         let mut result = SizeQuery{name: None, size: 0};
         for child in children {
