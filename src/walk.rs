@@ -77,33 +77,6 @@ pub mod comparisons {
         }
         result
     }
-
-    pub fn digit_len(num: u64) -> u64 {
-        let mut first = num;
-        let mut i = 0;
-        if num == 0 {
-            return 0
-        }
-        while first != 0 {
-            first /= 10;
-            i += 1;
-        }
-        i
-    }
-
-    pub fn human_readable(num: u64) -> String {
-        let result = String::from("");
-        let num_str = String::from(&num.to_string());
-        match num {
-            ..=1_000 => result + &num_str + "B",
-            1_001..=1_000_000 =>  result + &num_str[..(num_str.len() - 3)] + "KB",
-
-            1_000_001..=1_000_000_000 =>  result + &num_str[..(num_str.len() - 6)] + "MB",
-            1_000_000_001..=1_000_000_000_000 => result + &num_str[..(num_str.len() - 9)] + "GB",
-            1_000_000_000_001..=1_000_000_000_000_000 => result + &num_str[..(num_str.len() - 12)] + "TB",
-            1_000_000_000_000_001.. => result + &num_str[..(num_str.len() - 15)] + "PB",
-        }
-    }
 }
 
 pub mod lineage {
@@ -132,6 +105,45 @@ pub mod lineage {
                     recursively_list_contents(&child_path, children);
                 }
             }
+        }
+    }
+}
+
+pub mod format {
+    use std::collections::HashMap;
+    fn construct_hr_output(num_str: &str, unit: &str) -> String {
+        let units = HashMap::from([
+            ("B", 0),
+            ("KB", 3),
+            ("MB", 6),
+            ("GB", 9),
+            ("TB", 12),
+            ("PB", 15),
+        ]);
+        num_str[..(num_str.len() - units[unit])].to_string() + unit
+    }
+
+    /// ```
+    /// use treewalk::walk::format;
+    /// assert_eq!(format::human_readable(1_000), "1000B");
+    /// assert_eq!(format::human_readable(10_000_000), "10MB");
+    /// assert_eq!(format::human_readable(100_000_000), "100MB");
+    /// assert_eq!(format::human_readable(1_000_000_000), "1000MB");
+    /// assert_eq!(format::human_readable(1_000_000_001), "1GB");
+    /// assert_eq!(format::human_readable(1_000_000_000_000), "1000GB");
+    /// assert_eq!(format::human_readable(10_000_000_000_000), "10TB");
+    /// ```
+    pub fn human_readable(num: u64) -> String {
+        let result = String::from("");
+        let num_str = String::from(&num.to_string());
+        match num {
+            ..=1_000 => result + &num_str + "B",
+            1_001..=1_000_000 =>  construct_hr_output(&num_str, "KB"),
+
+            1_000_001..=1_000_000_000 => construct_hr_output(&num_str, "MB"),
+            1_000_000_001..=1_000_000_000_000 => construct_hr_output(&num_str, "GB"),
+            1_000_000_000_001..=1_000_000_000_000_000 => construct_hr_output(&num_str, "TB"),
+            1_000_000_000_000_001.. => construct_hr_output(&num_str, "PB"),
         }
     }
 }
