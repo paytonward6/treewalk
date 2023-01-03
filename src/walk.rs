@@ -17,7 +17,7 @@ pub mod comparison {
 //    }
 //
     //TODO: implement uniq for SizeQuery
-    pub fn base_comparison<F>(children: Vec<PathBuf>, f: F) -> SizeQuery
+    pub fn base_comparison<F>(children: Vec<PathBuf>, comparison: F) -> SizeQuery
         where F: Fn(u64, u64) -> bool {
         let mut result = SizeQuery{name: None, size: 0, unique: true};
         for child in children {
@@ -27,7 +27,7 @@ pub mod comparison {
                     if size.len() == result.size {
                         result.unique = false;
                     }
-                    if f(size.len(), result.size) {
+                    if comparison(size.len(), result.size) {
                         result.name = Some(child);
                         result.size = size.len();
                         result.unique = true;
@@ -40,63 +40,19 @@ pub mod comparison {
 
     //TODO: implement uniq for SizeQuery
     pub fn largest_dir(children: Vec<PathBuf>) -> SizeQuery {
-        let mut result = SizeQuery{name: None, size: 0, unique: true};
-        for child in children {
-            if child.is_dir() {
-                let size = child.as_path().metadata();
-                if let Ok(size) = size {
-                    if size.len() == result.size {
-                        result.unique = false;
-                    }
-                    if size.len() > result.size {
-                        result.name = Some(child);
-                        result.size = size.len();
-                        result.unique = true;
-                    }
-                }
-            }
-        }
-        result
+        base_comparison(children, |max:u64, child:u64| max > child)
+    }
+
+    pub fn largest_file(children: Vec<PathBuf>) -> SizeQuery {
+        base_comparison(children, |max: u64, child:u64| max > child)
     }
 
     pub fn smallest_file(children: Vec<PathBuf>) -> SizeQuery {
-        let mut result = SizeQuery{name: None, size: u64::MAX, unique: true};
-        for child in children {
-            if child.is_file() {
-                let size = child.as_path().metadata();
-                if let Ok(size) = size {
-                    if size.len() == result.size {
-                        result.unique = false;
-                    }
-                    if size.len() < result.size {
-                        result.name = Some(child);
-                        result.size = size.len();
-                        result.unique = true;
-                    }
-                }
-            }
-        }
-        result
+        base_comparison(children, |max: u64, child:u64| max < child)
     }
 
     pub fn smallest_dir(children: Vec<PathBuf>) -> SizeQuery {
-        let mut result = SizeQuery{name: None, size: u64::MAX, unique: true};
-        for child in children {
-            if child.is_dir() {
-                let size = child.as_path().metadata();
-                if let Ok(size) = size {
-                    if size.len() == result.size {
-                        result.unique = false;
-                    }
-                    if size.len() < result.size {
-                        result.name = Some(child);
-                        result.size = size.len();
-                        result.unique = true;
-                    }
-                }
-            }
-        }
-        result
+        base_comparison(children, |max: u64, child:u64| max < child)
     }
 }
 
