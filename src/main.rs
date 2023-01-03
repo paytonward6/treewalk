@@ -2,6 +2,19 @@ use std::env;
 use std::path::{Path, PathBuf};
 use treewalk::walk::{comparison, lineage, format};
 
+#[macro_export]
+macro_rules! vec {
+    ( $( $x:expr ),* ) => {
+        {
+            let mut temp_vec = Vec::new();
+            $(
+                temp_vec.push($x);
+            )*
+            temp_vec
+        }
+    };
+}
+
 fn main() {
 
     let args: Vec<String> = env::args().collect();
@@ -13,9 +26,6 @@ fn main() {
 
         let small = comparison::largest_file(children);
         println!("{:?}", small);
-        if let Some(file_name) = &small.name {
-            println!("{:?}: {:?}", file_name, format::human_readable(small.size));
-        }
 
         for ancestor in path.ancestors() {
             println!("{}", ancestor.display());
