@@ -12,12 +12,23 @@ pub mod comparison {
         pub unique: bool,
     }
 
-//    fn unique(size: &i64, prev_size: &i64, count: &mut u32) -> {
-//        if size 
-//    }
-//
-    //TODO: implement uniq for SizeQuery
-    pub fn base_comparison<F>(children: Vec<PathBuf>, comparison: F) -> SizeQuery
+    impl PartialEq for SizeQuery {
+        fn eq(&self, other: &Self) -> bool {
+            if self.name == other.name
+                && self.size == other.size
+                && self.unique == other.unique
+            {
+                return true
+            }
+            else {
+                return false
+            }
+        }
+    }
+    // Unsure if needed:
+    // impl Eq for SizeQuery {}
+
+    pub fn base_comparison<F>(children: &Vec<PathBuf>, comparison: F) -> SizeQuery
         where F: Fn(u64, u64) -> bool {
         let mut result = SizeQuery{name: None, size: 0, unique: true};
         for child in children {
@@ -28,7 +39,7 @@ pub mod comparison {
                         result.unique = false;
                     }
                     if comparison(size.len(), result.size) {
-                        result.name = Some(child);
+                        result.name = Some(child.to_path_buf());
                         result.size = size.len();
                         result.unique = true;
                     }
@@ -38,20 +49,19 @@ pub mod comparison {
         result
     }
 
-    //TODO: implement uniq for SizeQuery
-    pub fn largest_dir(children: Vec<PathBuf>) -> SizeQuery {
+    pub fn largest_dir(children: &Vec<PathBuf>) -> SizeQuery {
         base_comparison(children, |max:u64, child:u64| max > child)
     }
 
-    pub fn largest_file(children: Vec<PathBuf>) -> SizeQuery {
+    pub fn largest_file(children: &Vec<PathBuf>) -> SizeQuery {
         base_comparison(children, |max: u64, child:u64| max > child)
     }
 
-    pub fn smallest_file(children: Vec<PathBuf>) -> SizeQuery {
+    pub fn smallest_file(children: &Vec<PathBuf>) -> SizeQuery {
         base_comparison(children, |max: u64, child:u64| max < child)
     }
 
-    pub fn smallest_dir(children: Vec<PathBuf>) -> SizeQuery {
+    pub fn smallest_dir(children: &Vec<PathBuf>) -> SizeQuery {
         base_comparison(children, |max: u64, child:u64| max < child)
     }
 }

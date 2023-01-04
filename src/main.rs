@@ -24,8 +24,9 @@ fn main() {
         let mut children: Vec<PathBuf> = Vec::new();
         lineage::recursively_list_contents(&path.to_path_buf(), &mut children);
 
-        let small = comparison::largest_file(children);
+        let small = comparison::largest_file(&children);
         println!("{:?}", small);
+        println!("{:?}", children);
 
         for ancestor in path.ancestors() {
             println!("{}", ancestor.display());
