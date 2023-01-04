@@ -28,8 +28,7 @@ mod tests {
     #[test]
     fn test_comparisons() -> () {
         let test_directory = PathBuf::from("./test_files/test_dir1");
-        let mut children: Vec<PathBuf> = Vec::new();
-        lineage::recursively_list_contents(&test_directory, &mut children);
+        let children: Vec<PathBuf> = lineage::get_all_children(&test_directory);
 
         let largest_file_target = PathBuf::from("./test_files/test_dir1/file6.txt");
         assert_eq!(
@@ -60,25 +59,15 @@ mod tests {
                 unique: false,
             }
         );
-    }
-}
 
-fn main() {
-
-    let args: Vec<String> = env::args().collect();
-    if args.len() >= 2 {
-        let path = Path::new(&args[1]);
-
-        let mut children: Vec<PathBuf> = Vec::new();
-        lineage::recursively_list_contents(&path.to_path_buf(), &mut children);
-
-        let small = comparison::largest_file(&children);
-        if let Some(file_name) = &small.name {
-            println!("{:?}: {:?}", file_name, small.size);
-        }
-
-    }
-    else {
-        println!("No files found.");
+        let smallest_dir_target = None;
+        assert_eq!(
+            comparison::smallest_dir(&children),
+            comparison::SizeQuery {
+                name: smallest_dir_target,
+                size: 0,
+                unique: false
+            }
+        );
     }
 }

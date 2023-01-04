@@ -21,8 +21,7 @@ fn main() {
     if args.len() >= 2 {
         let path = Path::new(&args[1]);
 
-        let mut children: Vec<PathBuf> = Vec::new();
-        lineage::recursively_list_contents(&path.to_path_buf(), &mut children);
+        let children: Vec<PathBuf> = lineage::get_all_children(&path.to_path_buf());
 
         let small = comparison::largest_file(&children);
         println!("{:?}", small);
