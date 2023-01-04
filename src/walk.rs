@@ -28,11 +28,33 @@ pub mod comparison {
     // Unsure if needed:
     // impl Eq for SizeQuery {}
 
-    pub fn base_comparison<F>(children: &Vec<PathBuf>, comparison: F) -> SizeQuery
+    pub fn base_comparison_file<F>(children: &Vec<PathBuf>, comparison: F) -> SizeQuery
         where F: Fn(u64, u64) -> bool {
         let mut result = SizeQuery{name: None, size: 0, unique: true};
         for child in children {
             if child.is_file() {
+                let size = child.as_path().metadata();
+                if let Ok(size) = size {
+                    if size.len() == result.size {
+                        result.unique = false;
+                        result.name = Some(child.to_path_buf());
+                    }
+                    else if comparison(size.len(), result.size) {
+                        result.name = Some(child.to_path_buf());
+                        result.size = size.len();
+                        result.unique = true;
+                    }
+                }
+            }
+        }
+        result
+    }
+
+    pub fn base_comparison_dir<F>(children: &Vec<PathBuf>, comparison: F) -> SizeQuery
+        where F: Fn(u64, u64) -> bool {
+        let mut result = SizeQuery{name: None, size: 0, unique: true};
+        for child in children {
+            if child.is_dir() {
                 let size = child.as_path().metadata();
                 if let Ok(size) = size {
                     if size.len() == result.size {
@@ -50,19 +72,19 @@ pub mod comparison {
     }
 
     pub fn largest_dir(children: &Vec<PathBuf>) -> SizeQuery {
-        base_comparison(children, |max:u64, child:u64| max > child)
+        base_comparison_dir(children, |max:u64, child:u64| max > child)
     }
 
     pub fn largest_file(children: &Vec<PathBuf>) -> SizeQuery {
-        base_comparison(children, |max: u64, child:u64| max > child)
+        base_comparison_file(children, |max: u64, child:u64| max > child)
     }
 
     pub fn smallest_file(children: &Vec<PathBuf>) -> SizeQuery {
-        base_comparison(children, |max: u64, child:u64| max < child)
+        base_comparison_file(children, |max: u64, child:u64| max < child)
     }
 
     pub fn smallest_dir(children: &Vec<PathBuf>) -> SizeQuery {
-        base_comparison(children, |max: u64, child:u64| max < child)
+        base_comparison_dir(children, |max: u64, child:u64| max < child)
     }
 }
 

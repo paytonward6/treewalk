@@ -26,7 +26,7 @@ mod tests {
     }
 
     #[test]
-    fn test_comparison_largest_dir() -> () {
+    fn test_comparisons() -> () {
         let test_directory = PathBuf::from("./test_files/test_dir1");
         let mut children: Vec<PathBuf> = Vec::new();
         lineage::recursively_list_contents(&test_directory, &mut children);
@@ -38,6 +38,26 @@ mod tests {
                 name: Some(largest_file_target),
                 size: 352,
                 unique: true,
+            }
+        );
+
+        let largest_dir_target = PathBuf::from("./test_files/test_dir1/dir1");
+        assert_eq!(
+            comparison::largest_dir(&children),
+            comparison::SizeQuery {
+                name: Some(largest_dir_target),
+                size: 192,
+                unique: true,
+            }
+        );
+
+        let smallest_file_target = PathBuf::from("./test_files/test_dir1/file9.txt");
+        assert_eq!(
+            comparison::smallest_file(&children),
+            comparison::SizeQuery {
+                name: Some(smallest_file_target),
+                size: 0,
+                unique: false,
             }
         );
     }
