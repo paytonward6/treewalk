@@ -28,20 +28,22 @@ pub mod comparison {
     // Unsure if needed:
     // impl Eq for SizeQuery {}
 
-    pub fn base_comparison_file<F>(children: &Vec<PathBuf>, comparison: F) -> SizeQuery
+    pub fn base_comparison_file<F>(children: &Vec<PathBuf>, comparison: F, check_min: bool) -> SizeQuery
         where F: Fn(u64, u64) -> bool {
-        let mut result = SizeQuery{name: None, size: 0, unique: true};
+        let mut result = if let true = check_min
+                            {SizeQuery{name: None, size: u64::MAX, unique: true}}
+                        else {SizeQuery{name: None, size: u64::MIN, unique: true}};
         for child in children {
             if child.is_file() {
-                let size = child.as_path().metadata();
-                if let Ok(size) = size {
-                    if size.len() == result.size {
+                let meta_child = child.as_path().metadata();
+                if let Ok(meta_child) = meta_child {
+                    if meta_child.len() == result.size {
                         result.unique = false;
                         result.name = Some(child.to_path_buf());
                     }
-                    else if comparison(size.len(), result.size) {
+                    else if comparison(meta_child.len(), result.size) {
                         result.name = Some(child.to_path_buf());
-                        result.size = size.len();
+                        result.size = meta_child.len();
                         result.unique = true;
                     }
                 }
@@ -50,19 +52,26 @@ pub mod comparison {
         result
     }
 
-    pub fn base_comparison_dir<F>(children: &Vec<PathBuf>, comparison: F) -> SizeQuery
+    fn base_comparison_dir<F>(children: &Vec<PathBuf>, comparison: F, check_min: bool) -> SizeQuery
         where F: Fn(u64, u64) -> bool {
-        let mut result = SizeQuery{name: None, size: 0, unique: true};
+        let mut result = if let true = check_min {
+                             SizeQuery{ name: None,
+                                        size: u64::MAX,
+                                        unique: true}}
+                        else {
+                             SizeQuery{ name: None,
+                                        size: u64::MIN,
+                                        unique: true}};
         for child in children {
             if child.is_dir() {
-                let size = child.as_path().metadata();
-                if let Ok(size) = size {
-                    if size.len() == result.size {
+                let meta_child = child.as_path().metadata();
+                if let Ok(meta_child) = meta_child  {
+                    if meta_child.len() == result.size {
                         result.unique = false;
                     }
-                    if comparison(size.len(), result.size) {
+                    if comparison(meta_child.len(), result.size) {
                         result.name = Some(child.to_path_buf());
-                        result.size = size.len();
+                        result.size = meta_child.len();
                         result.unique = true;
                     }
                 }
@@ -72,19 +81,19 @@ pub mod comparison {
     }
 
     pub fn largest_dir(children: &Vec<PathBuf>) -> SizeQuery {
-        base_comparison_dir(children, |max:u64, child:u64| max > child)
+        base_comparison_dir(children, |child:u64, max:u64| child > max, false)
     }
 
     pub fn largest_file(children: &Vec<PathBuf>) -> SizeQuery {
-        base_comparison_file(children, |max: u64, child:u64| max > child)
+        base_comparison_file(children, |child: u64, max:u64| child > max, false)
     }
 
     pub fn smallest_file(children: &Vec<PathBuf>) -> SizeQuery {
-        base_comparison_file(children, |max: u64, child:u64| max < child)
+        base_comparison_file(children, |child: u64, min:u64| child < min, true)
     }
 
     pub fn smallest_dir(children: &Vec<PathBuf>) -> SizeQuery {
-        base_comparison_dir(children, |max: u64, child:u64| max < child)
+        base_comparison_dir(children, |child: u64, min:u64| child < min, true)
     }
 }
 

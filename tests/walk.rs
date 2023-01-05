@@ -60,12 +60,12 @@ mod tests {
             }
         );
 
-        let smallest_dir_target = None;
+        let smallest_dir_target = PathBuf::from("./test_files/test_dir1/dir2");
         assert_eq!(
             comparison::smallest_dir(&children),
             comparison::SizeQuery {
-                name: smallest_dir_target,
-                size: 0,
+                name: Some(smallest_dir_target),
+                size: 64,
                 unique: false
             }
         );
