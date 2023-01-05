@@ -51,7 +51,6 @@ pub mod comparison {
                 if let Ok(meta_child) = meta_child {
                     if meta_child.len() == result.size {
                         result.unique = false;
-                        result.name = Some(child.to_path_buf());
                     } else if comparison(meta_child.len(), result.size) {
                         result.name = Some(child.to_path_buf());
                         result.size = meta_child.len();
@@ -159,7 +158,7 @@ pub mod lineage {
 
 pub mod format {
     use std::collections::HashMap;
-    fn construct_hr_output(num_str: &str, unit: &str) -> String {
+    fn construct_hr_output(num: &u64, unit: &str) -> String {
         let units = HashMap::from([
             ("B", 0),
             ("KB", 3),
@@ -168,7 +167,9 @@ pub mod format {
             ("TB", 12),
             ("PB", 15),
         ]);
-        num_str[..(num_str.len() - units[unit])].to_string() + unit
+        let num_to_unit = num/(10u64.pow(units[unit]));
+        format!("{:.2}{}", num_to_unit, unit)
+        //num_str[..(num_str.len() - units[unit])].to_string() + unit
     }
 
     /// ```
@@ -183,15 +184,15 @@ pub mod format {
     /// ```
     pub fn human_readable(num: u64) -> String {
         let result = String::from("");
-        let num_str = String::from(&num.to_string());
+        //let num_str = String::from(&num.to_string());
         match num {
-            ..=1_000 => result + &num_str + "B",
-            1_001..=1_000_000 => construct_hr_output(&num_str, "KB"),
+            ..=1_000 => result + &num.to_string() + "B",
+            1_001..=1_000_000 => construct_hr_output(&num, "KB"),
 
-            1_000_001..=1_000_000_000 => construct_hr_output(&num_str, "MB"),
-            1_000_000_001..=1_000_000_000_000 => construct_hr_output(&num_str, "GB"),
-            1_000_000_000_001..=1_000_000_000_000_000 => construct_hr_output(&num_str, "TB"),
-            1_000_000_000_000_001.. => construct_hr_output(&num_str, "PB"),
+            1_000_001..=1_000_000_000 => construct_hr_output(&num, "MB"),
+            1_000_000_001..=1_000_000_000_000 => construct_hr_output(&num, "GB"),
+            1_000_000_000_001..=1_000_000_000_000_000 => construct_hr_output(&num, "TB"),
+            1_000_000_000_000_001.. => construct_hr_output(&num, "PB"),
         }
     }
 }

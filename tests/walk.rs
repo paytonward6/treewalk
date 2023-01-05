@@ -50,7 +50,7 @@ mod tests {
             }
         );
 
-        let smallest_file_target = PathBuf::from("./test_files/test_dir1/file9.txt");
+        let smallest_file_target = PathBuf::from("./test_files/test_dir1/file2.txt");
         assert_eq!(
             comparison::smallest_file(&children),
             comparison::SizeQuery {
