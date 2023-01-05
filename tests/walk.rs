@@ -3,12 +3,12 @@
 
 use std::env;
 use std::path::{Path, PathBuf};
-use treewalk::walk::{comparison, lineage, format};
+use treewalk::walk::{comparison, format, lineage};
 
 #[cfg(test)]
 mod tests {
     use std::path::{Path, PathBuf};
-    use treewalk::walk::{comparison, lineage, format};
+    use treewalk::walk::{comparison, format, lineage};
     #[test]
     fn test_format_human_readable() {
         assert_eq!(format::human_readable(999), "999B");

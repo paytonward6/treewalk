@@ -1,6 +1,6 @@
 use std::env;
 use std::path::{Path, PathBuf};
-use treewalk::walk::{comparison, lineage, format};
+use treewalk::walk::{comparison, format, lineage};
 
 #[macro_export]
 macro_rules! vec {
@@ -16,7 +16,6 @@ macro_rules! vec {
 }
 
 fn main() {
-
     let args: Vec<String> = env::args().collect();
     if args.len() >= 2 {
         let path = Path::new(&args[1]);
@@ -30,8 +29,7 @@ fn main() {
         for ancestor in path.ancestors() {
             println!("{}", ancestor.display());
         }
-    }
-    else {
+    } else {
         println!("No files found.");
     }
 }

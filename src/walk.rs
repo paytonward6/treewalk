@@ -14,25 +14,37 @@ pub mod comparison {
 
     impl PartialEq for SizeQuery {
         fn eq(&self, other: &Self) -> bool {
-            if self.name == other.name
-                && self.size == other.size
-                && self.unique == other.unique
-            {
-                return true
-            }
-            else {
-                return false
+            if self.name == other.name && self.size == other.size && self.unique == other.unique {
+                return true;
+            } else {
+                return false;
             }
         }
     }
     // Unsure if needed:
     // impl Eq for SizeQuery {}
 
-    pub fn base_comparison_file<F>(children: &Vec<PathBuf>, comparison: F, check_min: bool) -> SizeQuery
-        where F: Fn(u64, u64) -> bool {
-        let mut result = if let true = check_min
-                            {SizeQuery{name: None, size: u64::MAX, unique: true}}
-                        else {SizeQuery{name: None, size: u64::MIN, unique: true}};
+    pub fn base_comparison_file<F>(
+        children: &Vec<PathBuf>,
+        comparison: F,
+        check_min: bool,
+    ) -> SizeQuery
+    where
+        F: Fn(u64, u64) -> bool,
+    {
+        let mut result = if let true = check_min {
+            SizeQuery {
+                name: None,
+                size: u64::MAX,
+                unique: true,
+            }
+        } else {
+            SizeQuery {
+                name: None,
+                size: u64::MIN,
+                unique: true,
+            }
+        };
         for child in children {
             if child.is_file() {
                 let meta_child = child.as_path().metadata();
@@ -40,8 +52,7 @@ pub mod comparison {
                     if meta_child.len() == result.size {
                         result.unique = false;
                         result.name = Some(child.to_path_buf());
-                    }
-                    else if comparison(meta_child.len(), result.size) {
+                    } else if comparison(meta_child.len(), result.size) {
                         result.name = Some(child.to_path_buf());
                         result.size = meta_child.len();
                         result.unique = true;
@@ -53,19 +64,26 @@ pub mod comparison {
     }
 
     fn base_comparison_dir<F>(children: &Vec<PathBuf>, comparison: F, check_min: bool) -> SizeQuery
-        where F: Fn(u64, u64) -> bool {
+    where
+        F: Fn(u64, u64) -> bool,
+    {
         let mut result = if let true = check_min {
-                             SizeQuery{ name: None,
-                                        size: u64::MAX,
-                                        unique: true}}
-                        else {
-                             SizeQuery{ name: None,
-                                        size: u64::MIN,
-                                        unique: true}};
+            SizeQuery {
+                name: None,
+                size: u64::MAX,
+                unique: true,
+            }
+        } else {
+            SizeQuery {
+                name: None,
+                size: u64::MIN,
+                unique: true,
+            }
+        };
         for child in children {
             if child.is_dir() {
                 let meta_child = child.as_path().metadata();
-                if let Ok(meta_child) = meta_child  {
+                if let Ok(meta_child) = meta_child {
                     if meta_child.len() == result.size {
                         result.unique = false;
                     }
@@ -81,19 +99,19 @@ pub mod comparison {
     }
 
     pub fn largest_dir(children: &Vec<PathBuf>) -> SizeQuery {
-        base_comparison_dir(children, |child:u64, max:u64| child > max, false)
+        base_comparison_dir(children, |child: u64, max: u64| child > max, false)
     }
 
     pub fn largest_file(children: &Vec<PathBuf>) -> SizeQuery {
-        base_comparison_file(children, |child: u64, max:u64| child > max, false)
+        base_comparison_file(children, |child: u64, max: u64| child > max, false)
     }
 
     pub fn smallest_file(children: &Vec<PathBuf>) -> SizeQuery {
-        base_comparison_file(children, |child: u64, min:u64| child < min, true)
+        base_comparison_file(children, |child: u64, min: u64| child < min, true)
     }
 
     pub fn smallest_dir(children: &Vec<PathBuf>) -> SizeQuery {
-        base_comparison_dir(children, |child: u64, min:u64| child < min, true)
+        base_comparison_dir(children, |child: u64, min: u64| child < min, true)
     }
 }
 
@@ -104,7 +122,10 @@ pub mod lineage {
     pub fn children(path: &Path) -> Vec<PathBuf> {
         let mut children: Vec<PathBuf> = Vec::new();
         if path.is_dir() {
-            for child in path.read_dir().expect("Attempt to read contents of directory has failed!") {
+            for child in path
+                .read_dir()
+                .expect("Attempt to read contents of directory has failed!")
+            {
                 if let Ok(child) = child {
                     let child_path = child.path();
                     children.push(child_path);
@@ -116,7 +137,10 @@ pub mod lineage {
 
     fn get_all_driver(path: &PathBuf, children: &mut Vec<PathBuf>) -> () {
         if path.is_dir() {
-            for child in path.read_dir().expect("Attempt to read contents of directory has failed!") {
+            for child in path
+                .read_dir()
+                .expect("Attempt to read contents of directory has failed!")
+            {
                 if let Ok(child) = child {
                     let child_path = child.path();
                     children.push(child_path.to_path_buf());
@@ -162,7 +186,7 @@ pub mod format {
         let num_str = String::from(&num.to_string());
         match num {
             ..=1_000 => result + &num_str + "B",
-            1_001..=1_000_000 =>  construct_hr_output(&num_str, "KB"),
+            1_001..=1_000_000 => construct_hr_output(&num_str, "KB"),
 
             1_000_001..=1_000_000_000 => construct_hr_output(&num_str, "MB"),
             1_000_000_001..=1_000_000_000_000 => construct_hr_output(&num_str, "GB"),
@@ -171,4 +195,3 @@ pub mod format {
         }
     }
 }
-
