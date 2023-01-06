@@ -12,80 +12,59 @@ pub mod comparison {
         pub unique: bool,
     }
 
+    impl SizeQuery {
+        fn new(name: Option<PathBuf>, size: u64, unique: bool) -> Self {
+            Self { name, size, unique }
+        }
+
+        fn start_min() -> Self {
+            Self {
+                name: None,
+                size: u64::MAX,
+                unique: true,
+            }
+        }
+
+        fn start_max() -> Self {
+            Self {
+                name: None,
+                size: u64::MIN,
+                unique: true,
+            }
+        }
+
+        fn update(&mut self, name: Option<PathBuf>, size: u64, unique: bool) {
+            self.name = name;
+            self.size = size;
+            self.unique = unique;
+        }
+    }
+
     impl PartialEq for SizeQuery {
         fn eq(&self, other: &Self) -> bool {
             self.name == other.name && self.size == other.size && self.unique == other.unique
         }
     }
-    // Unsure if needed:
-    // impl Eq for SizeQuery {}
 
-    pub fn base_comparison_file<F>(
-        children: &Vec<PathBuf>,
-        comparison: F,
-        check_min: bool,
-    ) -> SizeQuery
+    fn base_comparison<F>(children: &Vec<PathBuf>, file_or_dir: F, is_min: bool) -> SizeQuery
     where
-        F: Fn(u64, u64) -> bool,
+        F: Fn(&Path) -> bool,
     {
-        let mut result = if let true = check_min {
-            SizeQuery {
-                name: None,
-                size: u64::MAX,
-                unique: true,
-            }
+        let mut result = if let true = is_min {
+            SizeQuery::start_min()
         } else {
-            SizeQuery {
-                name: None,
-                size: u64::MIN,
-                unique: true,
-            }
+            SizeQuery::start_max()
         };
         for child in children {
-            if child.is_file() {
+            if file_or_dir(child) {
                 let meta_child = child.as_path().metadata();
                 if let Ok(meta_child) = meta_child {
                     if meta_child.len() == result.size {
                         result.unique = false;
-                    } else if comparison(meta_child.len(), result.size) {
-                        result.name = Some(child.to_path_buf());
-                        result.size = meta_child.len();
-                        result.unique = true;
-                    }
-                }
-            }
-        }
-        result
-    }
-
-    fn base_comparison_dir<F>(children: &Vec<PathBuf>, comparison: F, check_min: bool) -> SizeQuery
-    where
-        F: Fn(u64, u64) -> bool,
-    {
-        let mut result = if let true = check_min {
-            SizeQuery {
-                name: None,
-                size: u64::MAX,
-                unique: true,
-            }
-        } else {
-            SizeQuery {
-                name: None,
-                size: u64::MIN,
-                unique: true,
-            }
-        };
-        for child in children {
-            if child.is_dir() {
-                let meta_child = child.as_path().metadata();
-                if let Ok(meta_child) = meta_child {
-                    if meta_child.len() == result.size {
-                        result.unique = false;
-                    }
-                    if comparison(meta_child.len(), result.size) {
-                        result.name = Some(child.to_path_buf());
-                        result.size = meta_child.len();
-                        result.unique = true;
+                    } else if !is_min && (meta_child.len() > result.size) {
+                        result.update(Some(child.to_path_buf()), meta_child.len(), true)
+                    } else if is_min && (meta_child.len() < result.size) {
+                        result.update(Some(child.to_path_buf()), meta_child.len(), true)
                     }
                 }
             }
@@ -94,19 +73,19 @@ pub mod comparison {
     }
 
     pub fn largest_dir(children: &Vec<PathBuf>) -> SizeQuery {
-        base_comparison_dir(children, |child: u64, max: u64| child > max, false)
+        base_comparison(children, |path| path.is_dir(), false)
     }
 
     pub fn largest_file(children: &Vec<PathBuf>) -> SizeQuery {
-        base_comparison_file(children, |child: u64, max: u64| child > max, false)
+        base_comparison(children, |path| path.is_file(), false)
     }
 
     pub fn smallest_file(children: &Vec<PathBuf>) -> SizeQuery {
-        base_comparison_file(children, |child: u64, min: u64| child < min, true)
+        base_comparison(children, |path| path.is_file(), true)
     }
 
     pub fn smallest_dir(children: &Vec<PathBuf>) -> SizeQuery {
-        base_comparison_dir(children, |child: u64, min: u64| child < min, true)
+        base_comparison(children, |path| path.is_dir(), true)
     }
 }
 
@@ -159,7 +138,7 @@ pub mod format {
             ("TB", 12),
             ("PB", 15),
         ]);
-        let num_to_unit = num/(10u64.pow(units[unit]));
+        let num_to_unit = num / (10u64.pow(units[unit]));
         format!("{:.2}{}", num_to_unit, unit)
         //num_str[..(num_str.len() - units[unit])].to_string() + unit
     }

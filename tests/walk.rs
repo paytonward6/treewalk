@@ -27,16 +27,36 @@ mod tests {
 
     #[test]
     fn test_comparisons() {
+        let children_children: Vec<PathBuf> =
+            lineage::get_all_children(&PathBuf::from("./tests/test_files/children"));
+        let test_children_children = [
+            "./tests/test_files/children/file2.txt",
+            "./tests/test_files/children/file3.txt",
+            "./tests/test_files/children/file1.txt",
+            "./tests/test_files/children/file4.txt",
+            "./tests/test_files/children/file5.txt",
+            "./tests/test_files/children/dir2",
+            "./tests/test_files/children/dir2/file2.txt",
+            "./tests/test_files/children/dir2/file3.txt",
+            "./tests/test_files/children/dir2/file1.txt",
+            "./tests/test_files/children/dir2/file4.txt",
+            "./tests/test_files/children/dir2/file5.txt",
+            "./tests/test_files/children/dir3",
+            "./tests/test_files/children/dir1",
+            "./tests/test_files/children/dir1/file2.txt",
+            "./tests/test_files/children/dir1/file3.txt",
+            "./tests/test_files/children/dir1/file1.txt",
+            "./tests/test_files/children/dir1/file4.txt",
+        ];
 
-
-        let children_children: Vec<PathBuf> = lineage::get_all_children(&PathBuf::from("./tests/test_files/children"));
-        let test_children_children = ["./tests/test_files/children/file2.txt", "./tests/test_files/children/file3.txt", "./tests/test_files/children/file1.txt", "./tests/test_files/children/file4.txt", "./tests/test_files/children/file5.txt", "./tests/test_files/children/dir2", "./tests/test_files/children/dir2/file2.txt", "./tests/test_files/children/dir2/file3.txt", "./tests/test_files/children/dir2/file1.txt", "./tests/test_files/children/dir2/file4.txt", "./tests/test_files/children/dir2/file5.txt", "./tests/test_files/children/dir3", "./tests/test_files/children/dir1", "./tests/test_files/children/dir1/file2.txt", "./tests/test_files/children/dir1/file3.txt", "./tests/test_files/children/dir1/file1.txt", "./tests/test_files/children/dir1/file4.txt"];
-        
-        assert_eq!(children_children, test_children_children.map(|path| PathBuf::from(path)));
-
+        assert_eq!(
+            children_children,
+            test_children_children.map(|path| PathBuf::from(path))
+        );
 
         let test_comparison_directory = PathBuf::from("./tests/test_files/test_dir1");
-        let comparison_children: Vec<PathBuf> = lineage::get_all_children(&test_comparison_directory);
+        let comparison_children: Vec<PathBuf> =
+            lineage::get_all_children(&test_comparison_directory);
         {
             let largest_file_target = PathBuf::from("./tests/test_files/test_dir1/file6.txt");
             assert_eq!(
