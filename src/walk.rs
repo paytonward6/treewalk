@@ -119,30 +119,29 @@ pub mod lineage {
         for child in path
             .read_dir()
             .expect("Attempt to read contents of directory has failed!")
+            .flatten()
         {
-            if let Ok(child) = child {
-                let child_path = child.path();
-                children.push(child_path);
-            }
+            let child_path = child.path();
+            children.push(child_path);
         }
         children
     }
 
-    fn get_all_driver(path: &PathBuf, children: &mut Vec<PathBuf>) {
+    fn get_all_driver(path: &Path, children: &mut Vec<PathBuf>) {
         if path.is_dir() {
             for child in path
                 .read_dir()
                 .expect("Attempt to read contents of directory has failed!")
                 .flatten()
             {
-                    let child_path = child.path();
-                    children.push(child_path.to_path_buf());
-                    get_all_driver(&child_path, children);
-                }
+                let child_path = child.path();
+                children.push(child_path.to_path_buf());
+                get_all_driver(&child_path, children);
             }
+        }
     }
 
-    pub fn get_all_children(path: &PathBuf) -> Vec<PathBuf> {
+    pub fn get_all_children(path: &Path) -> Vec<PathBuf> {
         let mut children: Vec<PathBuf> = Vec::new();
         get_all_driver(path, &mut children);
         children
