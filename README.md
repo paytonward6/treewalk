@@ -9,8 +9,7 @@ Common utilities for exploring a file tree
     fn main() {
         let path = Path::new("./foo/bar");
 
-        let mut children: Vec<PathBuf> = Vec::new();
-        lineage::recursively_list_contents(&path.to_path_buf(), &mut children);
+        let mut children: Vec<PathBuf> = lineage::get_all_children(&path.to_path_buf());
 
         let small = comparison::largest_file(children);
         if let Some(file_name) = &small.name {
