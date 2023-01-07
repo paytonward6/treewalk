@@ -15,10 +15,6 @@ Common utilities for exploring a file tree
         if let Some(file_name) = &small.name {
             println!("{:?}: {:?}", file_name, format::human_readable(small.size));
         }
-
-        for ancestor in path.ancestors() {
-            println!("{}", ancestor.display());
-        }
     }
 
 ```

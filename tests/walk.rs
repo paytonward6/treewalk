@@ -97,6 +97,9 @@ mod tests {
                     unique: false
                 }
             );
+
+            let size_range_target = ["./tests/test_files/test_dir1/file4.txt", "./tests/test_files/test_dir1/file6.txt"];
+            assert_eq!(comparison::size_range(&comparison_children, 200..400), size_range_target.map(|path| PathBuf::from(path)));
         }
     }
 }

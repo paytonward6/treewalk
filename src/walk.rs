@@ -4,6 +4,7 @@
 pub mod comparison {
     use std::path::Path;
     use std::path::PathBuf;
+    use std::ops::Range;
 
     #[derive(Debug)]
     pub struct SizeQuery {
@@ -46,7 +47,23 @@ pub mod comparison {
         }
     }
 
-    fn base_comparison<F>(children: &Vec<PathBuf>, file_or_dir: F, is_min: bool) -> SizeQuery
+    pub fn largest_dir(children: &Vec<PathBuf>) -> SizeQuery {
+        base_extrema_comparison(children, |path| path.is_dir(), false)
+    }
+
+    pub fn largest_file(children: &Vec<PathBuf>) -> SizeQuery {
+        base_extrema_comparison(children, |path| path.is_file(), false)
+    }
+
+    pub fn smallest_file(children: &Vec<PathBuf>) -> SizeQuery {
+        base_extrema_comparison(children, |path| path.is_file(), true)
+    }
+
+    pub fn smallest_dir(children: &Vec<PathBuf>) -> SizeQuery {
+        base_extrema_comparison(children, |path| path.is_dir(), true)
+    }
+
+    fn base_extrema_comparison<F>(children: &Vec<PathBuf>, file_or_dir: F, is_min: bool) -> SizeQuery
     where
         F: Fn(&Path) -> bool,
     {
@@ -72,20 +89,17 @@ pub mod comparison {
         result
     }
 
-    pub fn largest_dir(children: &Vec<PathBuf>) -> SizeQuery {
-        base_comparison(children, |path| path.is_dir(), false)
-    }
-
-    pub fn largest_file(children: &Vec<PathBuf>) -> SizeQuery {
-        base_comparison(children, |path| path.is_file(), false)
-    }
-
-    pub fn smallest_file(children: &Vec<PathBuf>) -> SizeQuery {
-        base_comparison(children, |path| path.is_file(), true)
-    }
-
-    pub fn smallest_dir(children: &Vec<PathBuf>) -> SizeQuery {
-        base_comparison(children, |path| path.is_dir(), true)
+    pub fn size_range(children: &Vec<PathBuf>, range: Range<u64>) -> Vec<PathBuf> {
+        let mut result: Vec<PathBuf> = Vec::new();
+        for child in children {
+            let meta_child = child.metadata();
+            if let Ok(meta_child) = meta_child {
+                if range.contains(&meta_child.len()) {
+                    result.push(child.to_path_buf());
+                }
+            }
+        }
+        result
     }
 }
 
