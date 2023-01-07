@@ -1,4 +1,5 @@
-# [treewalk v0.1.1](https://crates.io/crates/treewalk)
+<a href="https://crates.io/crates/treewalk"><img alt="Crate Info" src="https://img.shields.io/crates/v/treewalk.svg"/></a>
+# [treewalk v0.1.2](https://github.com/paytonward6/treewalk)
 Common utilities for exploring a file tree
 
 ## Example usage

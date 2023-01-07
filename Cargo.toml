@@ -4,6 +4,7 @@ version = "0.1.2"
 edition = "2021"
 authors = ["Payton Ward"]
 description = "Common utilities for exploring a file tree"
+repository = "https://github.com/paytonward6/treewalk"
 license = "MIT"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
