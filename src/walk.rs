@@ -5,6 +5,7 @@ pub mod comparison {
     use std::path::Path;
     use std::path::PathBuf;
     use std::ops::Range;
+    use crate::walk::format::Units;
 
     #[derive(Debug)]
     pub struct SizeQuery {
@@ -89,12 +90,12 @@ pub mod comparison {
         result
     }
 
-    pub fn size_range(children: &Vec<PathBuf>, range: Range<u64>) -> Vec<PathBuf> {
+    pub fn size_range(children: &Vec<PathBuf>, range: Range<u64>, units: Units) -> Vec<PathBuf> {
         let mut result: Vec<PathBuf> = Vec::new();
         for child in children {
             let meta_child = child.metadata();
             if let Ok(meta_child) = meta_child {
-                if range.contains(&meta_child.len()) {
+                if range.contains(&(&meta_child.len() / units as u64)) {
                     result.push(child.to_path_buf());
                 }
             }
@@ -143,18 +144,27 @@ pub mod lineage {
 
 pub mod format {
     use std::collections::HashMap;
-    fn construct_hr_output(num: &u64, unit: &str) -> String {
-        let units = HashMap::from([
-            ("B", 0),
-            ("KB", 3),
-            ("MB", 6),
-            ("GB", 9),
-            ("TB", 12),
-            ("PB", 15),
-        ]);
-        let num_to_unit = num / (10u64.pow(units[unit]));
+    use std::fmt;
+    fn construct_hr_output(num: &u64, unit: Units) -> String {
+        let num_to_unit = num / unit as u64;
         format!("{:.2}{}", num_to_unit, unit)
         //num_str[..(num_str.len() - units[unit])].to_string() + unit
+    }
+
+    #[derive(Clone, Copy, Debug)]
+    pub enum Units {
+        B = 1,
+        KB = 1_000,
+        MB = 1_000_000,
+        GB = 1_000_000_000,
+        TB = 1_000_000_000_000,
+        PB = 1_000_000_000_000_000,
+    }
+
+    impl fmt::Display for Units {
+        fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+            write!(f, "{:?}", self)
+        }
     }
 
     /// ```
@@ -172,12 +182,11 @@ pub mod format {
         //let num_str = String::from(&num.to_string());
         match num {
             ..=1_000 => result + &num.to_string() + "B",
-            1_001..=1_000_000 => construct_hr_output(&num, "KB"),
-
-            1_000_001..=1_000_000_000 => construct_hr_output(&num, "MB"),
-            1_000_000_001..=1_000_000_000_000 => construct_hr_output(&num, "GB"),
-            1_000_000_000_001..=1_000_000_000_000_000 => construct_hr_output(&num, "TB"),
-            1_000_000_000_000_001.. => construct_hr_output(&num, "PB"),
+            1_001..=1_000_000 => construct_hr_output(&num, Units::KB),
+            1_000_001..=1_000_000_000 => construct_hr_output(&num, Units::MB),
+            1_000_000_001..=1_000_000_000_000 => construct_hr_output(&num, Units::GB),
+            1_000_000_000_001..=1_000_000_000_000_000 => construct_hr_output(&num, Units::TB),
+            1_000_000_000_000_001.. => construct_hr_output(&num, Units::PB),
         }
     }
 }

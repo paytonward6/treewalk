@@ -9,6 +9,7 @@ use treewalk::walk::{comparison, format, lineage};
 mod tests {
     use std::path::{Path, PathBuf};
     use treewalk::walk::{comparison, format, lineage};
+    use format::Units;
     #[test]
     fn test_format_human_readable() {
         assert_eq!(format::human_readable(999), "999B");
@@ -99,7 +100,12 @@ mod tests {
             );
 
             let size_range_target = ["./tests/test_files/test_dir1/file4.txt", "./tests/test_files/test_dir1/file6.txt"];
-            assert_eq!(comparison::size_range(&comparison_children, 200..400), size_range_target.map(|path| PathBuf::from(path)));
+            assert_eq!(comparison::size_range(&comparison_children, 200..400, Units::B), size_range_target.map(|path| PathBuf::from(path)));
+
+            //let test_comparison_directory = PathBuf::from("/Users/payton/Code/Linux/");
+            //let comparison_children: Vec<PathBuf> = lineage::get_all_children(&test_comparison_directory);
+            //let size_range_target = ["./tests/test_files/test_dir1/file4.txt", "./tests/test_files/test_dir1/file6.txt"];
+            //assert_eq!(comparison::size_range(&comparison_children, 2..4, Units::GB), size_range_target.map(|path| PathBuf::from(path)));
         }
     }
 }
