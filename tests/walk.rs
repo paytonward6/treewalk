@@ -7,9 +7,9 @@ use treewalk::walk::{comparison, format, lineage};
 
 #[cfg(test)]
 mod tests {
-    use std::path::{Path, PathBuf};
-    use treewalk::walk::{comparison, format, lineage};
     use format::Units;
+    use std::path::{Path, PathBuf};
+    use treewalk::walk::{comparison, format, lineage, utils};
     #[test]
     fn test_format_human_readable() {
         assert_eq!(format::human_readable(999), "999B");
@@ -58,6 +58,10 @@ mod tests {
         let test_comparison_directory = PathBuf::from("./tests/test_files/test_dir1");
         let comparison_children: Vec<PathBuf> =
             lineage::get_all_children(&test_comparison_directory);
+
+        comparison::total_size(&comparison_children, Units::KB);
+
+        // BEGIN EXTREMA COMPARISONS
         {
             let largest_file_target = PathBuf::from("./tests/test_files/test_dir1/file6.txt");
             assert_eq!(
@@ -99,13 +103,31 @@ mod tests {
                 }
             );
 
-            let size_range_target = ["./tests/test_files/test_dir1/file4.txt", "./tests/test_files/test_dir1/file6.txt"];
-            assert_eq!(comparison::size_range(&comparison_children, 200..400, Units::B), size_range_target.map(|path| PathBuf::from(path)));
-
             //let test_comparison_directory = PathBuf::from("/Users/payton/Code/Linux/");
             //let comparison_children: Vec<PathBuf> = lineage::get_all_children(&test_comparison_directory);
             //let size_range_target = ["./tests/test_files/test_dir1/file4.txt", "./tests/test_files/test_dir1/file6.txt"];
             //assert_eq!(comparison::size_range(&comparison_children, 2..4, Units::GB), size_range_target.map(|path| PathBuf::from(path)));
-        }
+        } // END EXTREMA COMPARISON
+
+        // BEGIN RANGE COMPARISON
+        {
+            let size_range_target = [
+                "./tests/test_files/test_dir1/file4.txt",
+                "./tests/test_files/test_dir1/file6.txt",
+            ];
+            assert_eq!(
+                comparison::size_range(&comparison_children, 200..400, Units::B),
+                size_range_target.map(|path| PathBuf::from(path))
+            );
+        } // END RANGE COMPARISON
+    }
+    #[test]
+    fn test_utils() {
+        let test_vec: Vec<PathBuf> = vec!["./foo", "./bar"]
+            .iter()
+            .map(|path| PathBuf::from(path))
+            .collect();
+        assert_eq!(test_vec, utils::tree!["./foo", "./bar"]);
+        println!("{:?}", test_vec);
     }
 }

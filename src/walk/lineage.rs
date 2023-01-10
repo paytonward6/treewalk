@@ -28,6 +28,7 @@ fn get_all_driver(path: &Path, children: &mut Vec<PathBuf>) {
     }
 }
 
+/// returns a [Vec] of the children of a [Path] (recursively)
 pub fn get_all_children(path: &Path) -> Vec<PathBuf> {
     let mut children: Vec<PathBuf> = Vec::new();
     get_all_driver(path, &mut children);
