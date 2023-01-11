@@ -12,18 +12,18 @@ mod tests {
     use treewalk::walk::{comparison, format, lineage, utils};
     #[test]
     fn test_format_human_readable() {
-        assert_eq!(format::human_readable(999), "999B");
-        assert_eq!(format::human_readable(1_000), "1000B");
-        assert_eq!(format::human_readable(10_000), "10KB");
-        assert_eq!(format::human_readable(100_000), "100KB");
-        assert_eq!(format::human_readable(500_000), "500KB");
-        assert_eq!(format::human_readable(1_000_000), "1000KB");
-        assert_eq!(format::human_readable(10_000_000), "10MB");
-        assert_eq!(format::human_readable(100_000_000), "100MB");
-        assert_eq!(format::human_readable(1_000_000_000), "1000MB");
-        assert_eq!(format::human_readable(1_000_000_001), "1GB");
-        assert_eq!(format::human_readable(1_000_000_000_000), "1000GB");
-        assert_eq!(format::human_readable(10_000_000_000_000), "10TB");
+        assert_eq!(format::human_readable(999, false), "999B");
+        assert_eq!(format::human_readable(1_000, false), "1000B");
+        assert_eq!(format::human_readable(10_000, false), "10KB");
+        assert_eq!(format::human_readable(100_000, false), "100KB");
+        assert_eq!(format::human_readable(500_000, false), "500KB");
+        assert_eq!(format::human_readable(1_000_000, false), "1000KB");
+        assert_eq!(format::human_readable(10_000_000, false), "10MB");
+        assert_eq!(format::human_readable(100_000_000, false), "100MB");
+        assert_eq!(format::human_readable(1_000_000_000, false), "1000MB");
+        assert_eq!(format::human_readable(1_000_000_001, false), "1GB");
+        assert_eq!(format::human_readable(1_000_000_000_000, false), "1000GB");
+        assert_eq!(format::human_readable(10_000_000_000_000, false), "10TB");
     }
 
     #[test]
