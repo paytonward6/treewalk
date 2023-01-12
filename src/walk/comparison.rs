@@ -2,6 +2,7 @@ use crate::walk::format::Units;
 use std::ops::Range;
 use std::path::Path;
 use std::path::PathBuf;
+use std::io::ErrorKind;
 
 #[derive(Debug)]
 pub struct SizeQuery {
