@@ -44,8 +44,7 @@ pub fn human_readable(num: u64, as_float: bool) -> String {
 fn construct_hr_output(num: &u64, as_float: bool, unit: Units) -> String {
     if as_float {
         format!("{:.2}{}", *num as f64 / (unit as u64) as f64, unit)
-    }
-    else {
+    } else {
         format!("{:.2}{}", num / unit as u64, unit)
     }
 }
