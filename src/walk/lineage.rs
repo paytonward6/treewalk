@@ -1,8 +1,8 @@
-use std::io::Result;
+use std::io::{self, ErrorKind};
 use std::path::Path;
 use std::path::PathBuf;
 
-pub fn children(path: &Path) -> Result<Vec<PathBuf>> {
+pub fn children(path: &Path) -> Result<Vec<PathBuf>, io::Error> {
     let mut children: Vec<PathBuf> = Vec::new();
     let path = path.read_dir();
 
@@ -13,12 +13,25 @@ pub fn children(path: &Path) -> Result<Vec<PathBuf>> {
         }
     } else if let Err(path) = path {
         //panic!("Attempt to read contents of directory has failed!")
-        println!("Attempt to read contents of {path} has failed!")
+        eprintln!("Attempt to read contents of {path} has failed!")
     }
 
     Ok(children)
 }
 
+/// returns a [Vec] of the children of a [Path] (recursively)
+pub fn get_all_children(path: &Path) -> Result<Vec<PathBuf>, io::Error> {
+    let mut children: Vec<PathBuf> = Vec::new();
+    if path.try_exists()? {
+        get_all_driver(path, &mut children);
+        Ok(children)
+    } else {
+        Err(ErrorKind::NotFound.into())
+    }
+}
+
+/// is a driver since passing in a mutable [Vec] and returning
+/// nothing is pretty ugly
 fn get_all_driver(path: &Path, children: &mut Vec<PathBuf>) {
     if path.is_dir() {
         let path = path.read_dir();
@@ -38,11 +51,4 @@ fn get_all_driver(path: &Path, children: &mut Vec<PathBuf>) {
             children.pop();
         }
     }
-}
-
-/// returns a [Vec] of the children of a [Path] (recursively)
-pub fn get_all_children(path: &Path) -> Vec<PathBuf> {
-    let mut children: Vec<PathBuf> = Vec::new();
-    get_all_driver(path, &mut children);
-    children
 }

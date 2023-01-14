@@ -9,7 +9,7 @@ Common utilities for exploring a file tree
 
     fn main() {
         let path = Path::new("./foo/bar");
-        let children: Vec<PathBuf> = lineage::get_all_children(&path.to_path_buf());
+        let children: Vec<PathBuf> = lineage::get_all_children(&path.to_path_buf()).unwrap();
 
         // or create children from strings via
         let children_from_strs = utils::tree!["./this_file.txt", "./that_file.txt"];
