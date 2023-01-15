@@ -26,3 +26,11 @@ macro_rules! tree {
     };
 }
 pub use tree;
+
+pub fn num_dirs(children: &Vec<PathBuf>) -> usize {
+    children.iter().filter(|path| path.is_dir()).count()
+}
+
+pub fn num_files(children: &Vec<PathBuf>) -> usize {
+    children.iter().filter(|path| path.is_file()).count()
+}
