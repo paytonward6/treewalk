@@ -27,10 +27,12 @@ macro_rules! tree {
 }
 pub use tree;
 
+/// returns the number of sub-directories of a given path
 pub fn num_dirs(children: &Vec<PathBuf>) -> usize {
     children.iter().filter(|path| path.is_dir()).count()
 }
 
+/// returns the number of sub-files of a given path
 pub fn num_files(children: &Vec<PathBuf>) -> usize {
     children.iter().filter(|path| path.is_file()).count()
 }
