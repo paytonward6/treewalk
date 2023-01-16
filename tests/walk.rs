@@ -29,13 +29,14 @@ mod tests {
     #[test]
     fn test_comparisons() {
         let children_children: Vec<PathBuf> =
-            lineage::get_all_children(&PathBuf::from("./tests/test_files/children"));
+            lineage::get_all_children(&PathBuf::from("./tests/test_files/children")).unwrap();
         let test_children_children = [
             "./tests/test_files/children/file2.txt",
             "./tests/test_files/children/file3.txt",
             "./tests/test_files/children/file1.txt",
             "./tests/test_files/children/file4.txt",
             "./tests/test_files/children/file5.txt",
+            "./tests/test_files/children/sym1.txt",
             "./tests/test_files/children/dir2",
             "./tests/test_files/children/dir2/file2.txt",
             "./tests/test_files/children/dir2/file3.txt",
@@ -57,7 +58,7 @@ mod tests {
 
         let test_comparison_directory = PathBuf::from("./tests/test_files/test_dir1");
         let comparison_children: Vec<PathBuf> =
-            lineage::get_all_children(&test_comparison_directory);
+            lineage::get_all_children(&test_comparison_directory).unwrap();
 
         comparison::total_size(&comparison_children, Units::KB);
 
@@ -129,5 +130,12 @@ mod tests {
             .collect();
         assert_eq!(test_vec, utils::tree!["./foo", "./bar"]);
         println!("{:?}", test_vec);
+
+        let children: Vec<PathBuf> =
+            lineage::get_all_children(&PathBuf::from("./tests/test_files/children")).unwrap();
+
+        assert_eq!(utils::num_files(&children), 14);
+        assert_eq!(utils::num_dirs(&children), 3);
+        assert_eq!(utils::num_symlinks(&children), 1);
     }
 }

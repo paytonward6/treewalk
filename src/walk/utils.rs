@@ -36,3 +36,7 @@ pub fn num_dirs(children: &Vec<PathBuf>) -> usize {
 pub fn num_files(children: &Vec<PathBuf>) -> usize {
     children.iter().filter(|path| path.is_file()).count()
 }
+
+pub fn num_symlinks(children: &Vec<PathBuf>) -> usize {
+    children.iter().filter(|path| path.is_symlink()).count()
+}
